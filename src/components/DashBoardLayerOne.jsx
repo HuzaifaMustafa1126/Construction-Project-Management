@@ -1,11 +1,11 @@
-import UsersOverviewOne from "./child/UsersOverviewOne";
-import LatestRegisteredOne from "./child/LatestRegisteredOne";
-import TopPerformerOne from "./child/TopPerformerOne";
 import EarningStaticOne from "./child/EarningStaticOne";
 import TopCountries from "./child/TopCountries";
 import GeneratedContent from "./child/GeneratedContent";
 import TotalIncome from "./child/TotalIncome";
 import UnitCountOne from "./child/UnitCountOne";
+import RecentSitePhotos from "./child/RecentSitePhotos";
+import TodaySiteReports from "./child/TodaySiteReports";
+import MaterialStockStatus from "./child/MaterialStockStatus";
 
 const DashBoardLayerOne = () => {
   return (
@@ -20,14 +20,20 @@ const DashBoardLayerOne = () => {
         {/* Financial Summary */}
         <TotalIncome columnClassName="col-xxl-5" />
 
-        {/* UsersOverviewOne */}
-        <UsersOverviewOne />
+        {/* RecentSitePhotos */}
+        <div className="col-xl-4">
+          <RecentSitePhotos />
+        </div>
 
-        {/* LatestRegisteredOne */}
-        <LatestRegisteredOne />
+        {/* TodaySiteReports */}
+        <div className="col-xl-4">
+          <TodaySiteReports />
+        </div>
 
-        {/* TopPerformerOne */}
-        <TopPerformerOne />
+        {/* MaterialStockStatus */}
+        <div className="col-xl-4">
+          <MaterialStockStatus />
+        </div>
 
         {/* TopCountries */}
         <TopCountries />
