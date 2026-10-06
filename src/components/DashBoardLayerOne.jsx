@@ -6,6 +6,7 @@ import UnitCountOne from "./child/UnitCountOne";
 import RecentSitePhotos from "./child/RecentSitePhotos";
 import TodaySiteReports from "./child/TodaySiteReports";
 import MaterialStockStatus from "./child/MaterialStockStatus";
+import ActiveProjects from "./child/ActiveProjects";
 
 const DashBoardLayerOne = () => {
   return (
@@ -34,12 +35,8 @@ const DashBoardLayerOne = () => {
         <div className="col-xl-4">
           <MaterialStockStatus />
         </div>
-
-        {/* TopCountries */}
-        <TopCountries />
-
-        {/* GeneratedContent */}
-        <GeneratedContent />
+        {/* Active Projects */}
+        <ActiveProjects />
       </section>
     </>
   );
