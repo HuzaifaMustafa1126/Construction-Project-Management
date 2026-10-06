@@ -1,6 +1,7 @@
 import UnitCountTwo from "./child/UnitCountTwo";
 import RevenueGrowthOne from "./child/RevenueGrowthOne";
 import EarningStaticOne from "./child/EarningStaticOne";
+import TotalIncome from "./child/TotalIncome";
 import CampaignStaticOne from "./child/CampaignStaticOne";
 import ClientPaymentOne from "./child/ClientPaymentOne";
 import CountryStatusOne from "./child/CountryStatusOne";
@@ -19,6 +20,9 @@ const DashBoardLayerTwo = () => {
 
       {/* EarningStaticOne */}
       <EarningStaticOne />
+
+      {/* Financial Summary */}
+      <TotalIncome columnClassName="col-xxl-5" />
 
       {/* CampaignStaticOne */}
       <CampaignStaticOne />

@@ -12,7 +12,7 @@ const WidgetsLayer = () => {
     <>
       {/* Metrics */}
       <Metrics />
-      <div className='row gy-4 mt-1'>
+      <div className="row gy-4 mt-1">
         {/* SalesStatisticOne */}
         <SalesStatisticOne />
 

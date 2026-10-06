@@ -130,9 +130,7 @@ const MasterLayout = ({ children }) => {
               <NavLink
                 to="/"
                 end
-                className={({ isActive }) =>
-                  isActive ? "active-page" : ""
-                }
+                className={({ isActive }) => (isActive ? "active-page" : "")}
               >
                 <Icon
                   icon="solar:home-smile-angle-outline"
@@ -141,8 +139,8 @@ const MasterLayout = ({ children }) => {
                 <span>Dashboard</span>
               </NavLink>
             </li>
-              {/* Other dashboard pages are available in the demo. You can check them out by clicking on the below link. */}
-              {/* <ul className="sidebar-submenu">
+            {/* Other dashboard pages are available in the demo. You can check them out by clicking on the below link. */}
+            <ul className="sidebar-submenu">
                 <li>
                   <NavLink
                     to="/"
@@ -264,7 +262,7 @@ const MasterLayout = ({ children }) => {
                     Finance & Banking
                   </NavLink>
                 </li>
-              </ul> */}
+              </ul>
 
             <li className="sidebar-menu-group-title">Application</li>
             <li>

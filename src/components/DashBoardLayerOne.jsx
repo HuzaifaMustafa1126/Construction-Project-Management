@@ -1,10 +1,10 @@
-import SalesStatisticOne from "./child/SalesStatisticOne";
-import TotalSubscriberOne from "./child/TotalSubscriberOne";
 import UsersOverviewOne from "./child/UsersOverviewOne";
 import LatestRegisteredOne from "./child/LatestRegisteredOne";
 import TopPerformerOne from "./child/TopPerformerOne";
+import EarningStaticOne from "./child/EarningStaticOne";
 import TopCountries from "./child/TopCountries";
 import GeneratedContent from "./child/GeneratedContent";
+import TotalIncome from "./child/TotalIncome";
 import UnitCountOne from "./child/UnitCountOne";
 
 const DashBoardLayerOne = () => {
@@ -13,12 +13,12 @@ const DashBoardLayerOne = () => {
       {/* UnitCountOne */}
       <UnitCountOne />
 
-      <section className='row gy-4 mt-1'>
-        {/* SalesStatisticOne */}
-        <SalesStatisticOne />
+      <section className="row gy-4 mt-1">
+        {/* EarningStaticOne */}
+        <EarningStaticOne />
 
-        {/* TotalSubscriberOne */}
-        <TotalSubscriberOne />
+        {/* Financial Summary */}
+        <TotalIncome columnClassName="col-xxl-5" />
 
         {/* UsersOverviewOne */}
         <UsersOverviewOne />

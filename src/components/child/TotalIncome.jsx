@@ -1,60 +1,84 @@
-import useReactApexChart from "../../hook/useReactApexChart";
+/* eslint-disable react/prop-types */
 import ReactApexChart from "react-apexcharts";
 
-const TotalIncome = () => {
-  let { statisticsDonutChartOptionsTwo, statisticsDonutChartSeriesTwo } =
-    useReactApexChart();
+const financialBreakdown = [
+  { label: "Materials", percentage: 38, amount: "\u20B9 1,31,20,000", color: "#3385F5" },
+  { label: "Labor", percentage: 25, amount: "\u20B9 86,30,000", color: "#45B369" },
+  { label: "Subcontractors", percentage: 15, amount: "\u20B9 51,75,000", color: "#FF9F29" },
+  { label: "Machinery", percentage: 10, amount: "\u20B9 34,52,000", color: "#8252E9" },
+  { label: "Transportation", percentage: 7, amount: "\u20B9 24,15,000", color: "#F45B69" },
+  { label: "Miscellaneous", percentage: 5, amount: "\u20B9 17,28,000", color: "#9CA3AF" },
+];
+
+const TotalIncome = ({ columnClassName = "col-xxl-12 col-xl-6" }) => {
+  const chartOptions = {
+    chart: { type: "donut", fontFamily: "inherit" },
+    labels: financialBreakdown.map((item) => item.label),
+    colors: financialBreakdown.map((item) => item.color),
+    stroke: { width: 2, colors: ["#FFFFFF"] },
+    dataLabels: { enabled: false },
+    legend: { show: false },
+    plotOptions: {
+      pie: {
+        expandOnClick: false,
+        donut: { size: "64%" },
+      },
+    },
+    tooltip: {
+      y: {
+        formatter: (value, { seriesIndex }) =>
+          `${value}% - ${financialBreakdown[seriesIndex].amount}`,
+      },
+    },
+  };
+
   return (
-    <div className='col-xxl-12 col-xl-6'>
-      <div className='card h-100 radius-8 border-0'>
-        <div className='card-header border-bottom d-flex align-items-center flex-wrap gap-2 justify-content-between'>
-          <h6 className='mb-2 fw-bold text-lg'>Total Income</h6>
-          <div className=''>
-            <select className='form-select form-select-sm w-auto bg-base border-0 text-secondary-light'>
-              <option>This Month</option>
-              <option>This Week</option>
-              <option>This Year</option>
+    <div className={columnClassName}>
+      <div className="card h-100 radius-8 border financial-summary-card">
+        <div className="card-body p-16 d-flex flex-column">
+          <div className="d-flex align-items-center justify-content-between gap-3 mb-12">
+            <h6 className="mb-0 fw-bold text-lg">Financial Summary</h6>
+            <select
+              className="form-select form-select-sm w-auto bg-base border text-primary-light"
+              defaultValue="This Month"
+              aria-label="Financial summary period"
+            >
+              <option value="This Month">This Month</option>
+              <option value="This Week">This Week</option>
+              <option value="This Year">This Year</option>
             </select>
           </div>
-        </div>
-        <div className='card-body p-24'>
-          <div className='position-relative'>
-            <div
-              id='statisticsDonutChart'
-              className='mt-36 flex-grow-1 apexcharts-tooltip-z-none title-style circle-none'
-            >
+
+          <div className="financial-summary-content">
+            <div className="financial-summary-chart">
               <ReactApexChart
-                options={statisticsDonutChartOptionsTwo}
-                series={statisticsDonutChartSeriesTwo}
-                type='donut'
-                height={260}
+                options={chartOptions}
+                series={financialBreakdown.map((item) => item.percentage)}
+                type="donut"
+                height={205}
               />
+              <div className="financial-summary-total">
+                <strong>{"\u20B9 3,45,20,000"}</strong>
+                <span>Total Cost</span>
+              </div>
             </div>
-            <div className='text-center position-absolute top-50 start-50 translate-middle'>
-              <span className='text-secondary-light'>Income</span>
-              <h6 className=''>$28,500</h6>
+
+            <div className="financial-summary-legend">
+              {financialBreakdown.map((item) => (
+                <div className="financial-summary-row" key={item.label}>
+                  <span
+                    className="financial-summary-dot"
+                    style={{ backgroundColor: item.color }}
+                  />
+                  <span className="financial-summary-label">{item.label}</span>
+                  <span className="financial-summary-percent">
+                    {item.percentage}%
+                  </span>
+                  <strong>{item.amount}</strong>
+                </div>
+              ))}
             </div>
           </div>
-          <ul className='row gy-4 mt-3'>
-            <li className='col-6 d-flex flex-column align-items-center'>
-              <div className='d-flex align-items-center gap-2'>
-                <span className='w-12-px h-8-px rounded-pill bg-warning-600' />
-                <span className='text-secondary-light text-sm fw-normal'>
-                  Net Income
-                </span>
-              </div>
-              <h6 className='text-primary-light fw-bold mb-0'>$50,000</h6>
-            </li>
-            <li className='col-6 d-flex flex-column align-items-center'>
-              <div className='d-flex align-items-center gap-2'>
-                <span className='w-12-px h-8-px rounded-pill bg-success-600' />
-                <span className='text-secondary-light text-sm fw-normal'>
-                  Commission{" "}
-                </span>
-              </div>
-              <h6 className='text-primary-light fw-bold mb-0'>$20,000</h6>
-            </li>
-          </ul>
         </div>
       </div>
     </div>

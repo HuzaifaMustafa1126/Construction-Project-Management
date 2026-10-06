@@ -1,78 +1,110 @@
-import useReactApexChart from "../../hook/useReactApexChart";
 import ReactApexChart from "react-apexcharts";
-import { Icon } from "@iconify/react/dist/iconify.js";
+
+const projectProgress = [
+  { name: "Villa Emerald", progress: 85 },
+  { name: "Sunshine Apartments", progress: 60 },
+  { name: "Green Valley", progress: 40 },
+  { name: "City Plaza", progress: 75 },
+  { name: "Lakeview Residence", progress: 25 },
+  { name: "Tech Park", progress: 90 },
+];
 
 const EarningStaticOne = () => {
-  let { barChartSeriesTwo, barChartOptionsTwo } = useReactApexChart();
+  const chartSeries = [
+    {
+      name: "Project Progress",
+      data: projectProgress.map((project) => project.progress),
+    },
+  ];
+
+  const chartOptions = {
+    chart: {
+      type: "bar",
+      toolbar: { show: false },
+      zoom: { enabled: false },
+      fontFamily: "inherit",
+    },
+    colors: ["#3385F5", "#45B369", "#FF9F29", "#8252E9", "#F45B69", "#22B8C7"],
+    plotOptions: {
+      bar: {
+        distributed: true,
+        columnWidth: "55%",
+        borderRadius: 1,
+        dataLabels: { position: "top" },
+      },
+    },
+    dataLabels: {
+      enabled: true,
+      formatter: (value) => `${value}%`,
+      offsetY: -20,
+      style: {
+        fontSize: "12px",
+        fontWeight: 600,
+        colors: ["#111827"],
+      },
+      background: { enabled: false },
+    },
+    grid: {
+      show: true,
+      borderColor: "#E5E7EB",
+      strokeDashArray: 0,
+      padding: { top: 16, right: 6, bottom: 0, left: 4 },
+    },
+    xaxis: {
+      categories: [
+        ["Villa", "Emerald"],
+        ["Sunshine", "Apartments"],
+        "Green Valley",
+        "City Plaza",
+        ["Lakeview", "Residence"],
+        "Tech Park",
+      ],
+      axisBorder: { show: true, color: "#D1D5DB" },
+      axisTicks: { show: false },
+      labels: {
+        trim: false,
+        rotate: 0,
+        style: { fontSize: "11px", colors: "#374151" },
+      },
+    },
+    yaxis: {
+      min: 0,
+      max: 100,
+      tickAmount: 5,
+      labels: {
+        formatter: (value) => `${Math.round(value)}%`,
+        style: { fontSize: "11px", colors: ["#6B7280"] },
+      },
+    },
+    legend: { show: false },
+    tooltip: {
+      y: { formatter: (value) => `${value}% complete` },
+    },
+  };
+
   return (
-    <div className='col-xxl-8'>
-      <div className='card h-100 radius-8 border-0'>
-        <div className='card-body p-24'>
-          <div className='d-flex align-items-center flex-wrap gap-2 justify-content-between'>
-            <div>
-              <h6 className='mb-2 fw-bold text-lg'>Earning Statistic</h6>
-              <span className='text-sm fw-medium text-secondary-light'>
-                Yearly earning overview
-              </span>
-            </div>
-            <div className=''>
-              <select
-                className='form-select form-select-sm w-auto bg-base border text-secondary-light'
-                defaultValue=''
-              >
-                <option value='' disabled>
-                  Select Frequency
-                </option>
-                <option value='Yearly'>Yearly</option>
-                <option value='Monthly'>Monthly</option>
-                <option value='Weekly'>Weekly</option>
-                <option value='Today'>Today</option>
-              </select>
-            </div>
+    <div className="col-xxl-7">
+      <div className="card h-100 radius-8 border">
+        <div className="card-body p-20">
+          <div className="d-flex align-items-center justify-content-between gap-3 mb-8">
+            <h6 className="mb-0 fw-bold text-lg">Project Progress Overview</h6>
+            <select
+              className="form-select form-select-sm w-auto bg-base border text-primary-light"
+              defaultValue="Project Progress"
+              aria-label="Choose project chart metric"
+            >
+              <option value="Project Progress">Project Progress</option>
+              <option value="Budget Utilization">Budget Utilization</option>
+              <option value="Time Utilization">Time Utilization</option>
+            </select>
           </div>
-          <div className='mt-20 d-flex justify-content-center flex-wrap gap-3'>
-            <div className='d-inline-flex align-items-center gap-2 p-2 radius-8 border pe-36 br-hover-primary group-item'>
-              <span className='bg-neutral-100 w-44-px h-44-px text-xxl radius-8 d-flex justify-content-center align-items-center text-secondary-light group-hover:bg-primary-600 group-hover:text-white'>
-                <Icon icon='fluent:cart-16-filled' className='icon' />
-              </span>
-              <div>
-                <span className='text-secondary-light text-sm fw-medium'>
-                  Sales
-                </span>
-                <h6 className='text-md fw-semibold mb-0'>$200k</h6>
-              </div>
-            </div>
-            <div className='d-inline-flex align-items-center gap-2 p-2 radius-8 border pe-36 br-hover-primary group-item'>
-              <span className='bg-neutral-100 w-44-px h-44-px text-xxl radius-8 d-flex justify-content-center align-items-center text-secondary-light group-hover:bg-primary-600 group-hover:text-white'>
-                <Icon icon='uis:chart' className='icon' />
-              </span>
-              <div>
-                <span className='text-secondary-light text-sm fw-medium'>
-                  Income
-                </span>
-                <h6 className='text-md fw-semibold mb-0'>$200k</h6>
-              </div>
-            </div>
-            <div className='d-inline-flex align-items-center gap-2 p-2 radius-8 border pe-36 br-hover-primary group-item'>
-              <span className='bg-neutral-100 w-44-px h-44-px text-xxl radius-8 d-flex justify-content-center align-items-center text-secondary-light group-hover:bg-primary-600 group-hover:text-white'>
-                <Icon icon='ph:arrow-fat-up-fill' className='icon' />
-              </span>
-              <div>
-                <span className='text-secondary-light text-sm fw-medium'>
-                  Profit
-                </span>
-                <h6 className='text-md fw-semibold mb-0'>$200k</h6>
-              </div>
-            </div>
-          </div>
-          <div id='barChart'>
-            <ReactApexChart
-              options={barChartOptionsTwo}
-              series={barChartSeriesTwo}
-              type='bar'
-              height={310}
-            />
-          </div>
+
+          <ReactApexChart
+            options={chartOptions}
+            series={chartSeries}
+            type="bar"
+            height={210}
+          />
         </div>
       </div>
     </div>
