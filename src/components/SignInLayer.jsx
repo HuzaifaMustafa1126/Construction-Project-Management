@@ -1,8 +1,11 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { useState } from "react";
 
 import { Link } from "react-router-dom";
 
 const SignInLayer = () => {
+  const [showPassword, setShowPassword] = useState(false);
+
   return (
     <section className='auth bg-base d-flex flex-wrap'>
       <div className='auth-left d-lg-block d-none'>
@@ -13,7 +16,7 @@ const SignInLayer = () => {
       <div className='auth-right py-32 px-24 d-flex flex-column justify-content-center'>
         <div className='max-w-464-px mx-auto w-100'>
           <div>
-            <Link to='/index' className='mb-40 max-w-290-px'>
+            <Link to='/' className='mb-40 max-w-290-px'>
               <img src='assets/images/logo.png' alt='WowDash React Vite' />
             </Link>
             <h4 className='mb-12'>Sign In to your Account</h4>
@@ -29,7 +32,8 @@ const SignInLayer = () => {
               <input
                 type='email'
                 className='form-control h-56-px bg-neutral-50 radius-12'
-                placeholder='Email'
+                  placeholder='Email'
+                  required
               />
             </div>
             <div className='position-relative mb-20'>
@@ -38,16 +42,22 @@ const SignInLayer = () => {
                   <Icon icon='solar:lock-password-outline' />
                 </span>
                 <input
-                  type='password'
+                  type={showPassword ? 'text' : 'password'}
                   className='form-control h-56-px bg-neutral-50 radius-12'
                   id='your-password'
                   placeholder='Password'
+                  required
                 />
               </div>
-              <span
-                className='toggle-password ri-eye-line cursor-pointer position-absolute end-0 top-50 translate-middle-y me-16 text-secondary-light'
-                data-toggle='#your-password'
-              />
+              <button
+                type='button'
+                className='toggle-password position-absolute end-0 top-50 translate-middle-y me-16 text-secondary-light bg-transparent border-0 p-0'
+                onClick={() => setShowPassword((visible) => !visible)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                aria-pressed={showPassword}
+              >
+                <Icon icon={showPassword ? 'solar:eye-closed-outline' : 'solar:eye-outline'} />
+              </button>
             </div>
             <div className=''>
               <div className='d-flex justify-content-between gap-2'>
@@ -62,7 +72,7 @@ const SignInLayer = () => {
                     Remember me{" "}
                   </label>
                 </div>
-                <Link to='#' className='text-primary-600 fw-medium'>
+                <Link to='/forgot-password' className='text-primary-600 fw-medium'>
                   Forgot Password?
                 </Link>
               </div>
@@ -86,7 +96,7 @@ const SignInLayer = () => {
                   icon='ic:baseline-facebook'
                   className='text-primary-600 text-xl line-height-1'
                 />
-                Google
+                Facebook
               </button>
               <button
                 type='button'

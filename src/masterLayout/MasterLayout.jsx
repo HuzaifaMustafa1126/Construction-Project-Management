@@ -153,6 +153,19 @@ const MasterLayout = ({ children }) => {
                 <span>Daily Site Reports</span>
               </NavLink>
             </li>
+            <li>
+              <NavLink
+                to="/users"
+                end
+                className={({ isActive }) => (isActive ? "active-page" : "")}
+              >
+                <Icon
+                  icon="solar:users-group-rounded-outline"
+                  className="menu-icon"
+                />
+                <span>Users</span>
+              </NavLink>
+            </li>
             {/* Other dashboard pages are available in the demo. You can check them out by clicking on the below link. */}
             {/* <ul className="sidebar-submenu">
                 <li>
