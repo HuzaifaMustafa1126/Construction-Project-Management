@@ -6,6 +6,7 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
 import UsersListPage from "./pages/UsersListPage";
+import AddUserPage from "./pages/AddUserPage";
 
 function App() {
   return (
@@ -18,6 +19,9 @@ function App() {
         <Route path="/sign-up" element={<SignUpPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/users" element={<UsersListPage />} />
+        <Route path="/add-user" element={<AddUserPage />} />
+        <Route path="/users/new" element={<AddUserPage />} />
+        <Route path="/users/:userId/edit" element={<AddUserPage />} />
         <Route
           exact
           path="/daily-site-reports"

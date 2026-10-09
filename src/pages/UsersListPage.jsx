@@ -1,20 +1,9 @@
 import MasterLayout from "../masterLayout/MasterLayout";
-import Breadcrumb from "../components/Breadcrumb";
 import UsersListLayer from "../components/UsersListLayer";
-
-const UsersListPage = () => {
+export default function UsersListPage() {
   return (
-    <>
-      {/* MasterLayout */}
-      <MasterLayout>
-        {/* Breadcrumb */}
-        <Breadcrumb title='User Management' />
-
-        {/* UsersListLayer */}
-        <UsersListLayer />
-      </MasterLayout>
-    </>
+    <MasterLayout>
+      <UsersListLayer />
+    </MasterLayout>
   );
-};
-
-export default UsersListPage;
+}
