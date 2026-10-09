@@ -1,4 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import $ from "jquery";
+import "datatables.net-dt";
 import { Icon } from "@iconify/react/dist/iconify.js";
 
 const initialUsers = [
@@ -10,21 +12,60 @@ const initialUsers = [
 const emptyForm = { firstName: "", lastName: "", email: "", password: "", phone: "", role: "" };
 const roles = ["Admin", "Project Manager", "Site Engineer", "Supervisor", "Accountant"];
 
+// Isolate DataTables DOM changes; remount when the user records change.
+/* eslint-disable react/prop-types */
+const UsersTable = ({ users, onEdit, onDelete, onView }) => {
+  const tableRef = useRef(null);
+  useEffect(() => {
+    const table = $(tableRef.current).DataTable({
+      pageLength: 10,
+      columnDefs: [{ targets: -1, orderable: false, searchable: false }],
+      language: { emptyTable: "No users found." },
+    });
+    return () => { table.destroy(); };
+  }, []);
+  return <div>
+            <table ref={tableRef} data-page-length={10} className="table bordered-table mb-0">
+              <thead><tr><th scope="col"><div className="form-check style-check d-flex align-items-center"><input type="checkbox" className="form-check-input" aria-label="Select all users" onChange={(event) => { $(tableRef.current).DataTable().rows({ search: "applied" }).nodes().to$().find('input[type="checkbox"]').prop("checked", event.target.checked); }} /><span className="form-check-label">S.L</span></div></th><th>Name</th><th>Email</th><th>Phone Number</th><th>Role</th><th scope="col">Action</th></tr></thead>
+              <tbody>
+                {users.map((user, index) => (
+                  <tr key={user.id}>
+                    <td><div className="form-check style-check d-flex align-items-center"><input type="checkbox" className="form-check-input" aria-label={`Select ${user.firstName} ${user.lastName}`} /><span className="form-check-label">{String(index + 1).padStart(2, "0")}</span></div></td>
+                    <td>
+                      <div className="d-flex align-items-center">
+                        <span className="w-40-px h-40-px me-12 rounded-circle bg-primary-50 text-primary-600 d-flex align-items-center justify-content-center fw-semibold flex-shrink-0">{user.firstName[0]}{user.lastName[0]}</span>
+                        <h6 className="text-md mb-0 fw-medium flex-grow-1">{user.firstName} {user.lastName}</h6>
+                      </div>
+                    </td>
+                    <td >{user.email}</td>
+                    <td >{user.phone}</td>
+                    <td><span className="bg-success-focus text-success-main px-24 py-4 rounded-pill fw-medium text-sm">{user.role}</span></td>
+                    <td>
+                      <div className="d-flex align-items-center">
+                        <button type="button" title="View user" aria-label={`View ${user.firstName} ${user.lastName}`} className="w-32-px h-32-px me-8 bg-primary-light text-primary-600 rounded-circle d-inline-flex align-items-center justify-content-center border-0" onClick={() => onView(user)}><Icon icon="iconamoon:eye-light" /></button>
+                        <button type="button" title="Edit user" aria-label={`Edit ${user.firstName} ${user.lastName}`} className="w-32-px h-32-px me-8 bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center border-0" onClick={() => onEdit(user)}>
+                          <Icon icon="lucide:edit"  />
+                        </button>
+                        <button type="button" title="Delete user" aria-label={`Delete ${user.firstName} ${user.lastName}`} className="w-32-px h-32-px me-8 bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center border-0" onClick={() => onDelete(user)}>
+                          <Icon icon="mingcute:delete-2-line"  />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+  </div>;
+};
+/* eslint-enable react/prop-types */
+
 const UsersListLayer = () => {
   const [users, setUsers] = useState(initialUsers);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [search, setSearch] = useState("");
-
-  const filteredUsers = useMemo(() => {
-    const query = search.trim().toLowerCase();
-    if (!query) return users;
-    return users.filter((user) =>
-      `${user.firstName} ${user.lastName} ${user.email} ${user.phone} ${user.role}`.toLowerCase().includes(query),
-    );
-  }, [search, users]);
+  const [viewingUser, setViewingUser] = useState(null);
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -70,53 +111,33 @@ const UsersListLayer = () => {
 
   return (
     <>
-      <div className="card h-100 p-0 radius-12">
-        <div className="card-header border-bottom bg-base py-16 px-24 d-flex align-items-center flex-wrap gap-3 justify-content-between">
-          <form className="navbar-search" onSubmit={(event) => event.preventDefault()}>
-            <input type="search" className="bg-base h-40-px w-auto" placeholder="Search users" value={search} onChange={(event) => setSearch(event.target.value)} />
-            <Icon icon="ion:search-outline" className="icon" />
-          </form>
+      <div className="card basic-data-table">
+        <div className="card-header d-flex align-items-center justify-content-between flex-wrap gap-3">
+          <h5 className="card-title mb-0">Users List</h5>
           <button type="button" className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2" onClick={openAddModal}>
             <Icon icon="ic:baseline-plus" className="icon text-xl line-height-1" /> Add User
           </button>
         </div>
-
-        <div className="card-body p-24">
-          <div className="table-responsive scroll-sm">
-            <table className="table bordered-table sm-table mb-0">
-              <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Phone Number</th><th>Role</th><th className="text-center">Action</th></tr></thead>
-              <tbody>
-                {filteredUsers.map((user, index) => (
-                  <tr key={user.id}>
-                    <td>{String(index + 1).padStart(2, "0")}</td>
-                    <td>
-                      <div className="d-flex align-items-center gap-12">
-                        <span className="w-40-px h-40-px rounded-circle bg-primary-50 text-primary-600 d-flex align-items-center justify-content-center fw-semibold flex-shrink-0">{user.firstName[0]}{user.lastName[0]}</span>
-                        <span className="text-md fw-medium text-primary-light">{user.firstName} {user.lastName}</span>
-                      </div>
-                    </td>
-                    <td className="text-secondary-light">{user.email}</td>
-                    <td className="text-secondary-light">{user.phone}</td>
-                    <td><span className="bg-primary-50 text-primary-600 px-12 py-4 radius-4 fw-medium text-sm">{user.role}</span></td>
-                    <td>
-                      <div className="d-flex align-items-center gap-10 justify-content-center">
-                        <button type="button" title="Edit user" aria-label={`Edit ${user.firstName} ${user.lastName}`} className="bg-success-focus text-success-600 bg-hover-success-200 fw-medium w-40-px h-40-px d-flex justify-content-center align-items-center rounded-circle border-0" onClick={() => openEditModal(user)}>
-                          <Icon icon="lucide:edit" className="text-xl" />
-                        </button>
-                        <button type="button" title="Delete user" aria-label={`Delete ${user.firstName} ${user.lastName}`} className="bg-danger-focus bg-hover-danger-200 text-danger-600 fw-medium w-40-px h-40-px d-flex justify-content-center align-items-center rounded-circle border-0" onClick={() => deleteUser(user)}>
-                          <Icon icon="fluent:delete-24-regular" className="text-xl" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-                {filteredUsers.length === 0 && <tr><td colSpan="6" className="text-center py-32 text-secondary-light">No users found.</td></tr>}
-              </tbody>
-            </table>
-          </div>
-          <div className="mt-24 text-secondary-light text-sm">Showing {filteredUsers.length} of {users.length} users</div>
+        <div className="card-body">
+          <UsersTable key={JSON.stringify(users)} users={users} onEdit={openEditModal} onDelete={deleteUser} onView={setViewingUser} />
         </div>
       </div>
+      {viewingUser && (
+        <>
+          <div className="modal fade show d-block" role="dialog" aria-modal="true" aria-labelledby="user-details-title" tabIndex="-1">
+            <div className="modal-dialog modal-dialog-centered"><div className="modal-content bg-base">
+              <div className="modal-header"><h5 className="modal-title" id="user-details-title">User Details</h5><button type="button" className="btn-close" aria-label="Close" onClick={() => setViewingUser(null)} /></div>
+              <div className="modal-body"><dl className="mb-0">
+                <dt>Name</dt><dd>{viewingUser.firstName} {viewingUser.lastName}</dd>
+                <dt>Email</dt><dd>{viewingUser.email}</dd>
+                <dt>Phone Number</dt><dd>{viewingUser.phone}</dd>
+                <dt>Role</dt><dd>{viewingUser.role}</dd>
+              </dl></div>
+            </div></div>
+          </div>
+          <div className="modal-backdrop fade show" onClick={() => setViewingUser(null)} />
+        </>
+      )}
 
       {isModalOpen && (
         <>
