@@ -33,26 +33,6 @@ let users = [
     department: "Management",
     status: "Active",
   },
-  {
-    id: 2,
-    firstName: "Hamza",
-    lastName: "Ali",
-    email: "hamza@example.com",
-    phone: "+92 301 7654321",
-    role: "Project Manager",
-    department: "Projects",
-    status: "Active",
-  },
-  {
-    id: 3,
-    firstName: "Sara",
-    lastName: "Ahmed",
-    email: "sara@example.com",
-    phone: "+92 302 1122334",
-    role: "Site Engineer",
-    department: "Site Operations",
-    status: "Active",
-  },
 ];
 const listeners = new Set();
 export const getUsers = () => users;
