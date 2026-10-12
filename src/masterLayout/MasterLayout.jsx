@@ -1,12 +1,33 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import ThemeToggleButton from "../helper/ThemeToggleButton";
+
+import { useAuth } from "../context/AuthContext";
+import { toast } from "react-toastify";
 
 const MasterLayout = ({ children }) => {
   let [sidebarActive, seSidebarActive] = useState(false);
   let [mobileMenu, setMobileMenu] = useState(false);
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  async function handleLogout(event) {
+    event.preventDefault();
+    if (loggingOut) return;
+    setLoggingOut(true);
+    try {
+      await logout();
+    } catch {
+      toast.error("Signed out locally. The server could not confirm logout.");
+    } finally {
+      navigate("/login", { replace: true });
+      setLoggingOut(false);
+    }
+  }
+
   const location = useLocation(); // Hook to get the current route
 
   useEffect(() => {
@@ -1970,6 +1991,8 @@ const MasterLayout = ({ children }) => {
                         <Link
                           className="dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-danger d-flex align-items-center gap-3"
                           to="#"
+                          onClick={handleLogout}
+                          aria-disabled={loggingOut}
                         >
                           <Icon icon="lucide:power" className="icon text-xl" />{" "}
                           Log Out

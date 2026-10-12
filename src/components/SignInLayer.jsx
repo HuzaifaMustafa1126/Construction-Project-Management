@@ -1,10 +1,54 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useState } from "react";
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
+import { toast } from "react-toastify";
+import { useAuth } from "../context/AuthContext";
 
 const SignInLayer = () => {
   const [showPassword, setShowPassword] = useState(false);
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const { login, logout } = useAuth();
+  const navigate = useNavigate();
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    if (submitting) return;
+    setSubmitting(true);
+
+    try {
+      const user = await login(email.trim(), password);
+      if (user.role !== "admin") {
+        try {
+          await logout();
+        } catch {
+          // Logout still clears the local session if the server is unavailable.
+        }
+        toast.error("Only admins can access this dashboard.");
+        return;
+      }
+      navigate("/", { replace: true });
+    } catch (error) {
+      const data = error.response?.data;
+      if (data?.errors) {
+        Object.values(data.errors).flat().forEach((message) => toast.error(message));
+      } else if (error.response?.status === 429) {
+        toast.error("Too many login attempts. Please try again later.");
+      } else if (error.response?.status === 401) {
+        toast.error(data?.message || "Incorrect email or password.");
+      } else if (!error.response && error.request) {
+        toast.error("Cannot connect to the server. Please try again.");
+      } else {
+        toast.error(data?.message || error.message || "Unable to sign in.");
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   return (
     <section className='auth bg-base d-flex flex-wrap'>
@@ -24,13 +68,16 @@ const SignInLayer = () => {
               Welcome back! please enter your detail
             </p>
           </div>
-          <form action='#'>
+          <form onSubmit={handleSubmit}>
             <div className='icon-field mb-16'>
               <span className='icon top-50 translate-middle-y'>
                 <Icon icon='mage:email' />
               </span>
               <input
                 type='email'
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                autoComplete='username'
                 className='form-control h-56-px bg-neutral-50 radius-12'
                   placeholder='Email'
                   required
@@ -45,6 +92,9 @@ const SignInLayer = () => {
                   type={showPassword ? 'text' : 'password'}
                   className='form-control h-56-px bg-neutral-50 radius-12'
                   id='your-password'
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  autoComplete='current-password'
                   placeholder='Password'
                   required
                 />
@@ -79,10 +129,11 @@ const SignInLayer = () => {
             </div>
             <button
               type='submit'
+              disabled={submitting}
               className='btn btn-primary text-sm btn-sm px-12 py-16 w-100 radius-12 mt-32'
             >
               {" "}
-              Sign In
+              {submitting ? "Signing In..." : "Sign In"}
             </button>
             <div className='mt-32 center-border-horizontal text-center'>
               <span className='bg-base z-1 px-4'>Or sign in with</span>
