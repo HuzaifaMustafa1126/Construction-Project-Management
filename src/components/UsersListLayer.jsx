@@ -35,6 +35,7 @@ const roleColors = {
   "Project Manager": "blue",
   "Site Engineer": "purple",
   Supervisor: "orange",
+  "Site Supervisor": "orange",
   Accountant: "red",
   Client: "blue",
   "Labor Manager": "purple",
@@ -94,9 +95,17 @@ export default function UsersListLayer() {
   return (
     <section className="users-management" aria-labelledby="users-title">
       <header className="um-heading">
-        <div><h1 id="users-title">Users</h1>
-        <p>Manage all system users, roles and permissions</p></div>
-        <button type="button" className="um-add-user" onClick={() => setCreating(true)}><Plus size={17} /> Add User</button>
+        <div>
+          <h1 id="users-title">Users</h1>
+          <p>Manage all system users, roles and permissions</p>
+        </div>
+        <button
+          type="button"
+          className="um-add-user"
+          onClick={() => setCreating(true)}
+        >
+          <Plus size={17} /> Add User
+        </button>
       </header>
       <section className="um-stats" aria-label="User statistics">
         {[
@@ -274,26 +283,33 @@ export default function UsersListLayer() {
                       >
                         <MoreHorizontal />
                       </Dropdown.Toggle>
-                      {createPortal(<Dropdown.Menu className="um-action-menu">
-                        <Dropdown.Item onClick={() => setViewing(user)}>
-                          View User
-                        </Dropdown.Item>
-                        <Dropdown.Item as={Link} to={`/users/${user.id}/edit`}>
-                          Edit User
-                        </Dropdown.Item>
-                        <Dropdown.Item
-                          onClick={() => toggleUserStatus(user.id)}
-                        >
-                          Set {user.status === "Active" ? "Inactive" : "Active"}
-                        </Dropdown.Item>
-                        <Dropdown.Divider />
-                        <Dropdown.Item
-                          className="text-danger"
-                          onClick={() => remove(user)}
-                        >
-                          Delete User
-                        </Dropdown.Item>
-                      </Dropdown.Menu>, document.body)}
+                      {createPortal(
+                        <Dropdown.Menu className="um-action-menu">
+                          <Dropdown.Item onClick={() => setViewing(user)}>
+                            View User
+                          </Dropdown.Item>
+                          <Dropdown.Item
+                            as={Link}
+                            to={`/users/${user.id}/edit`}
+                          >
+                            Edit User
+                          </Dropdown.Item>
+                          <Dropdown.Item
+                            onClick={() => toggleUserStatus(user.id)}
+                          >
+                            Set{" "}
+                            {user.status === "Active" ? "Inactive" : "Active"}
+                          </Dropdown.Item>
+                          <Dropdown.Divider />
+                          <Dropdown.Item
+                            className="text-danger"
+                            onClick={() => remove(user)}
+                          >
+                            Delete User
+                          </Dropdown.Item>
+                        </Dropdown.Menu>,
+                        document.body,
+                      )}
                     </Dropdown>
                   </td>
                 </tr>
@@ -349,8 +365,25 @@ export default function UsersListLayer() {
           {notice}
         </div>
       )}
-      <Modal show={creating} onHide={() => { if (!creatingBusy) setCreating(false); }} centered className="user-create-dialog" backdropClassName="user-create-backdrop" aria-labelledby="add-user-title" unmountOnExit>
-        <AddUserLayer onCancel={() => setCreating(false)} onSaved={(message) => { setCreating(false); setNotice(message); }} onBusyChange={setCreatingBusy} />
+      <Modal
+        show={creating}
+        onHide={() => {
+          if (!creatingBusy) setCreating(false);
+        }}
+        centered
+        className="user-create-dialog"
+        backdropClassName="user-create-backdrop"
+        aria-labelledby="add-user-title"
+        unmountOnExit
+      >
+        <AddUserLayer
+          onCancel={() => setCreating(false)}
+          onSaved={(message) => {
+            setCreating(false);
+            setNotice(message);
+          }}
+          onBusyChange={setCreatingBusy}
+        />
       </Modal>
       <Modal
         show={!!viewing}

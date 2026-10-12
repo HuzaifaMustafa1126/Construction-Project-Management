@@ -1,11 +1,25 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { getUsers, subscribeUsers, roles, saveUser } from "./users/userStore";
+import { getUsers, subscribeUsers, saveUser } from "./users/userStore";
 import { Eye, EyeOff, ChevronDown, LoaderCircle, X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createUserSchema } from "../utils/userSchema";
+import { createUser } from "../services/userService";
 import "./users/AddUserLayer.css";
+
+const createUserRoleOptions = [
+  { label: "Admin", value: "admin" },
+  { label: "Site Supervisor", value: "supervisor" },
+  { label: "Client", value: "client" },
+];
+const createUserRoleValues = createUserRoleOptions.map(({ value }) => value);
+const roleValueByLabel = Object.fromEntries(
+  createUserRoleOptions.map(({ label, value }) => [label, value]),
+);
+const roleLabelByValue = Object.fromEntries(
+  createUserRoleOptions.map(({ label, value }) => [value, label]),
+);
 
 // eslint-disable-next-line react/prop-types
 export default function AddUserLayer({ onCancel, onSaved, onBusyChange } = {}) {
@@ -20,7 +34,9 @@ export default function AddUserLayer({ onCancel, onSaved, onBusyChange } = {}) {
     setError,
     formState: { errors, isSubmitting },
   } = useForm({
-    resolver: zodResolver(createUserSchema(roles, users, user?.id)),
+    resolver: zodResolver(
+      createUserSchema(createUserRoleValues, users, user?.id),
+    ),
     mode: "onBlur",
     reValidateMode: "onChange",
     defaultValues: {
@@ -29,23 +45,75 @@ export default function AddUserLayer({ onCancel, onSaved, onBusyChange } = {}) {
       email: user?.email || "",
       phone: user?.phone || "",
       password: "",
-      role: user?.role || "",
+      role: roleValueByLabel[user?.role] || user?.role || "",
     },
   });
-  useEffect(() => { onBusyChange?.(isSubmitting); }, [isSubmitting, onBusyChange]);
+  useEffect(() => {
+    onBusyChange?.(isSubmitting);
+  }, [isSubmitting, onBusyChange]);
   const close = () => {
-    if (!isSubmitting) { if (onCancel) onCancel(); else navigate("/users"); }
+    if (!isSubmitting) {
+      if (onCancel) onCancel();
+      else navigate("/users");
+    }
   };
   const submit = async (data) => {
     try {
-      await saveUser(data, user?.id);
-      const message = user ? "User updated successfully." : "User created successfully.";
+      let message;
+
+      if (user) {
+        await saveUser(
+          { ...data, role: roleLabelByValue[data.role] || data.role },
+          user.id,
+        );
+        message = "User updated successfully.";
+      } else {
+        const payload = {
+          first_name: data.firstName,
+          last_name: data.lastName,
+          email: data.email,
+          phone: data.phone || null,
+          password: data.password,
+          role: data.role,
+        };
+
+        const response = await createUser(payload);
+
+        console.log("User created:", response.user);
+        saveUser({ ...data, role: roleLabelByValue[data.role] });
+        message = response.message || "User created successfully.";
+      }
+
       if (onSaved) onSaved(message);
       else navigate("/users", { state: { userNotice: message } });
     } catch (error) {
-      if (error.fields) { Object.entries(error.fields).forEach(([field, message]) => setError(field, { message }, { shouldFocus: true })); return; }
+      if (error.response?.status === 422) {
+        const validationErrors = error.response.data.errors;
+        const fieldNames = {
+          first_name: "firstName",
+          last_name: "lastName",
+        };
+
+        console.log("Laravel validation errors:", validationErrors);
+        Object.entries(validationErrors || {}).forEach(([field, messages]) =>
+          setError(fieldNames[field] || field, {
+            message: Array.isArray(messages) ? messages[0] : messages,
+          }),
+        );
+        return;
+      }
+
+      if (error.fields) {
+        Object.entries(error.fields).forEach(([field, message]) =>
+          setError(field, { message }, { shouldFocus: true }),
+        );
+        return;
+      }
+      const message =
+        error.response?.data?.message || "Failed to create user";
+      console.error(message);
       setError("root", {
-        message: "Unable to save the user. Please try again.",
+        message,
       });
     }
   };
@@ -71,11 +139,28 @@ export default function AddUserLayer({ onCancel, onSaved, onBusyChange } = {}) {
       {required && <span className="user-required"> *</span>}
     </label>
   );
-  if (userId && !user) return <div className="card p-24"><p role="alert">User not found.</p><Link to="/users">Back to users</Link></div>;
+  if (userId && !user)
+    return (
+      <div className="card p-24">
+        <p role="alert">User not found.</p>
+        <Link to="/users">Back to users</Link>
+      </div>
+    );
   return (
     <section className="add-user-layer" aria-labelledby="add-user-title">
-      <div className="user-modal-header"><h2 id="add-user-title">{user ? "Edit User" : "Add New User"}</h2>
-        {onCancel && <button type="button" className="user-close" onClick={close} disabled={isSubmitting} aria-label="Close"><X size={20} /></button>}
+      <div className="user-modal-header">
+        <h2 id="add-user-title">{user ? "Edit User" : "Add New User"}</h2>
+        {onCancel && (
+          <button
+            type="button"
+            className="user-close"
+            onClick={close}
+            disabled={isSubmitting}
+            aria-label="Close"
+          >
+            <X size={20} />
+          </button>
+        )}
       </div>
       <form onSubmit={handleSubmit(submit)} noValidate>
         <fieldset disabled={isSubmitting} className="user-fieldset">
@@ -152,9 +237,9 @@ export default function AddUserLayer({ onCancel, onSaved, onBusyChange } = {}) {
                   <option value="" disabled>
                     Select role
                   </option>
-                  {roles.map((role) => (
-                    <option key={role} value={role}>
-                      {role}
+                  {createUserRoleOptions.map(({ label, value }) => (
+                    <option key={value} value={value}>
+                      {label}
                     </option>
                   ))}
                 </select>
