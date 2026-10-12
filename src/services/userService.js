@@ -9,3 +9,7 @@ export const getUsers = async () => {
   const response = await api.get("/users");
   return response.data.users;
 };
+export const deleteUser = async (userId) => {
+  const response = await api.delete(`/users/${userId}`);
+  return response.data;
+};

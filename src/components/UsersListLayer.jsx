@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
+
 import AddUserLayer from "./AddUserLayer";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -16,11 +17,12 @@ import {
 } from "lucide-react";
 import Dropdown from "react-bootstrap/Dropdown";
 import Modal from "react-bootstrap/Modal";
+import { deleteUser } from "../services/userService";
 import {
   getUsers,
   subscribeUsers,
   roles,
-  deleteUser,
+  deleteUser as removeUserFromTable,
   toggleUserStatus,
 } from "./users/userStore";
 import {
@@ -28,6 +30,7 @@ import {
   userStatistics,
   paginateUsers,
 } from "./users/userListModel";
+
 import "./users/UsersManagement.css";
 
 const emptyFilters = { search: "", role: "", status: "", department: "" };
@@ -83,14 +86,30 @@ export default function UsersListLayer() {
       else next.add(id);
       return next;
     });
-  const remove = (user) => {
-    if (!window.confirm(`Delete ${user.firstName} ${user.lastName}?`)) return;
-    deleteUser(user.id);
-    setSelected((current) => {
-      const next = new Set(current);
-      next.delete(user.id);
-      return next;
-    });
+  const handleDeleteUser = async (userId) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this user?",
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await deleteUser(userId);
+
+      // Remove the deleted user from the table.
+      removeUserFromTable(userId);
+
+      // Remove the deleted user from the selected rows too.
+      setSelected((previousSelected) => {
+        const nextSelected = new Set(previousSelected);
+        nextSelected.delete(userId);
+        return nextSelected;
+      });
+
+      alert("User deleted successfully!");
+    } catch (error) {
+      alert(error.response?.data?.message || "Failed to delete user.");
+    }
   };
   return (
     <section className="users-management" aria-labelledby="users-title">
@@ -303,7 +322,7 @@ export default function UsersListLayer() {
                           <Dropdown.Divider />
                           <Dropdown.Item
                             className="text-danger"
-                            onClick={() => remove(user)}
+                            onClick={() => handleDeleteUser(user.id)}
                           >
                             Delete User
                           </Dropdown.Item>
