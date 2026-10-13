@@ -45,6 +45,9 @@ import "./users/UsersManagement.css";
 
 const emptyFilters = { search: "", role: "", status: "", department: "" };
 const roleColors = {
+  admin: "gray",
+  supervisor: "orange",
+  client: "blue",
   "Project Manager": "blue",
   "Site Engineer": "purple",
   Supervisor: "orange",
@@ -55,6 +58,25 @@ const roleColors = {
   Admin: "gray",
   Procurement: "cyan",
 };
+const departmentColors = {
+  Management: "gray",
+  Engineering: "blue",
+  Finance: "green",
+  "Site Operations": "purple",
+  Procurement: "cyan",
+  Projects: "orange",
+};
+const badgeColors = ["blue", "purple", "orange", "cyan", "green", "red"];
+
+function getDepartmentColor(department) {
+  if (departmentColors[department]) return departmentColors[department];
+
+  const colorIndex = [...department].reduce(
+    (total, character) => total + character.charCodeAt(0),
+    0,
+  );
+  return badgeColors[colorIndex % badgeColors.length];
+}
 
 function normalizeUser(user) {
   const fullName = String(user.name || "").trim();
@@ -312,7 +334,17 @@ export default function UsersListLayer() {
                       {user.role}
                     </span>
                   </td>
-                  <td>{user.department || "Unassigned"}</td>
+                  <td>
+                    {user.department ? (
+                      <span
+                        className={`um-badge ${getDepartmentColor(user.department)}`}
+                      >
+                        {user.department}
+                      </span>
+                    ) : (
+                      <span className="um-muted">{"\u2014"}</span>
+                    )}
+                  </td>
                   <td>
                     <span
                       className={`um-badge ${user.status === "Active" ? "green" : "red"}`}

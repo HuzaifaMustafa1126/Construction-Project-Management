@@ -33,6 +33,10 @@ export function createUserSchema(roles, users, editingId = null) {
       role: z
         .string()
         .refine((value) => roles.includes(value), "Select a valid role."),
+      department: z
+        .string()
+        .trim()
+        .max(255, "Department must not exceed 255 characters."),
     })
     .superRefine((form, context) => {
       const errors = getUserDuplicateErrors(form, users, editingId);

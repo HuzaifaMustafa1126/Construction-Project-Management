@@ -10,17 +10,6 @@ export const roles = [
   "Labor Manager",
   "Procurement",
 ];
-export const roleDepartments = {
-  Admin: "Management",
-  "Project Manager": "Projects",
-  "Site Engineer": "Site Operations",
-  Supervisor: "Site Operations",
-  "Site Supervisor": "Site Operations",
-  Accountant: "Finance",
-  Client: "Clients",
-  "Labor Manager": "Labor",
-  Procurement: "Procurement",
-};
 // Existing local sample data. Replace this store with the user API when available.
 let users = [];
 const listeners = new Set();
@@ -54,7 +43,7 @@ export function saveUser(data, editingId = null) {
           ? {
               ...user,
               ...details,
-              department: roleDepartments[details.role] || user.department,
+              department: details.department ?? user.department,
             }
           : user,
       ),
@@ -65,7 +54,7 @@ export function saveUser(data, editingId = null) {
       {
         ...details,
         id: Date.now(),
-        department: roleDepartments[details.role],
+        department: details.department || "",
         status: "Active",
       },
     ]);

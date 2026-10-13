@@ -31,6 +31,7 @@ export default function AddUserLayer({ onCancel, onSaved, onBusyChange } = {}) {
   const {
     register,
     handleSubmit,
+    reset,
     setError,
     formState: { errors, isSubmitting },
   } = useForm({
@@ -46,6 +47,7 @@ export default function AddUserLayer({ onCancel, onSaved, onBusyChange } = {}) {
       phone: user?.phone || "",
       password: "",
       role: roleValueByLabel[user?.role] || user?.role || "",
+      department: user?.department || "",
     },
   });
   useEffect(() => {
@@ -75,6 +77,7 @@ export default function AddUserLayer({ onCancel, onSaved, onBusyChange } = {}) {
           phone: data.phone || null,
           password: data.password,
           role: data.role,
+          department: data.department || null,
         };
 
         const response = await createUser(payload);
@@ -84,6 +87,7 @@ export default function AddUserLayer({ onCancel, onSaved, onBusyChange } = {}) {
         message = response.message || "User created successfully.";
       }
 
+      reset();
       if (onSaved) onSaved(message);
       else navigate("/users", { state: { userNotice: message } });
     } catch (error) {
@@ -255,6 +259,15 @@ export default function AddUserLayer({ onCancel, onSaved, onBusyChange } = {}) {
                 />
               </div>
               {error("role")}
+            </div>
+            <div className="user-department-field">
+              {label("department", "Department", false)}
+              <input
+                {...fieldProps("department")}
+                placeholder="Enter department"
+                autoComplete="organization-title"
+              />
+              {error("department")}
             </div>
           </div>
         </fieldset>
