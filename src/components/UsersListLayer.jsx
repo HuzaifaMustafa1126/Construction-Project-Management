@@ -1,4 +1,10 @@
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { createPortal } from "react-dom";
 
 import AddUserLayer from "./AddUserLayer";
@@ -17,11 +23,15 @@ import {
 } from "lucide-react";
 import Dropdown from "react-bootstrap/Dropdown";
 import Modal from "react-bootstrap/Modal";
-import { deleteUser } from "../services/userService";
+import {
+  deleteUser,
+  getUsers as fetchUsers,
+} from "../services/userService";
 import {
   getUsers,
   subscribeUsers,
   roles,
+  replaceUsers,
   deleteUser as removeUserFromTable,
   toggleUserStatus,
 } from "./users/userStore";
@@ -45,8 +55,25 @@ const roleColors = {
   Admin: "gray",
   Procurement: "cyan",
 };
+
+function normalizeUser(user) {
+  const fullName = String(user.name || "").trim();
+  const [fallbackFirstName = "", ...remainingNames] = fullName.split(/\s+/);
+
+  return {
+    ...user,
+    firstName: user.firstName ?? user.first_name ?? fallbackFirstName,
+    lastName: user.lastName ?? user.last_name ?? remainingNames.join(" "),
+    lastLogin: user.lastLogin ?? user.last_login ?? null,
+    department: user.department ?? user.department_name ?? "",
+    status: user.status ?? "Active",
+  };
+}
+
 export default function UsersListLayer() {
   const users = useSyncExternalStore(subscribeUsers, getUsers);
+  const [loadingUsers, setLoadingUsers] = useState(true);
+  const [usersError, setUsersError] = useState("");
   const [filters, setFilters] = useState(emptyFilters);
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState(new Set());
@@ -65,6 +92,24 @@ export default function UsersListLayer() {
   const allSelected =
     pagination.rows.length > 0 &&
     pagination.rows.every((user) => selected.has(user.id));
+  const loadUsers = useCallback(async () => {
+    setLoadingUsers(true);
+    setUsersError("");
+
+    try {
+      const apiUsers = await fetchUsers();
+      replaceUsers(apiUsers.map(normalizeUser));
+    } catch (error) {
+      setUsersError(
+        error.response?.data?.message || "Failed to load users.",
+      );
+    } finally {
+      setLoadingUsers(false);
+    }
+  }, []);
+  useEffect(() => {
+    loadUsers();
+  }, [loadUsers]);
   useEffect(() => {
     if (selectAllRef.current)
       selectAllRef.current.indeterminate =
@@ -246,8 +291,9 @@ export default function UsersListLayer() {
                         <img src={user.avatar} alt="" />
                       ) : (
                         <span className="um-avatar">
-                          {user.firstName[0]}
-                          {user.lastName[0]}
+                          {(user.firstName?.[0] || user.email?.[0] || "U")
+                            .toUpperCase()}
+                          {user.lastName?.[0]?.toUpperCase() || ""}
                         </span>
                       )}
                       <div>
@@ -336,7 +382,9 @@ export default function UsersListLayer() {
               {!pagination.rows.length && (
                 <tr>
                   <td colSpan={9} className="um-empty">
-                    No users match your filters.
+                    {loadingUsers
+                      ? "Loading users..."
+                      : usersError || "No users match your filters."}
                   </td>
                 </tr>
               )}
@@ -397,9 +445,10 @@ export default function UsersListLayer() {
       >
         <AddUserLayer
           onCancel={() => setCreating(false)}
-          onSaved={(message) => {
+          onSaved={async (message) => {
             setCreating(false);
             setNotice(message);
+            await loadUsers();
           }}
           onBusyChange={setCreatingBusy}
         />

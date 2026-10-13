@@ -22,18 +22,7 @@ export const roleDepartments = {
   Procurement: "Procurement",
 };
 // Existing local sample data. Replace this store with the user API when available.
-let users = [
-  {
-    id: 1,
-    firstName: "Ayesha",
-    lastName: "Khan",
-    email: "ayesha@example.com",
-    phone: "+92 300 1234567",
-    role: "Admin",
-    department: "Management",
-    status: "Active",
-  },
-];
+let users = [];
 const listeners = new Set();
 export const getUsers = () => users;
 export const subscribeUsers = (listener) => {
@@ -43,6 +32,9 @@ export const subscribeUsers = (listener) => {
 function publish(next) {
   users = next;
   listeners.forEach((listener) => listener());
+}
+export function replaceUsers(nextUsers) {
+  publish(nextUsers);
 }
 export function saveUser(data, editingId = null) {
   const errors = getUserDuplicateErrors(data, users, editingId);

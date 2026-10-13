@@ -110,7 +110,12 @@ export default function AddUserLayer({ onCancel, onSaved, onBusyChange } = {}) {
         return;
       }
       const message =
-        error.response?.data?.message || "Failed to create user";
+        error.code === "ECONNABORTED"
+          ? "The server took too long to create the user. Please try again."
+          : error.response?.data?.message ||
+            (error.request
+              ? "Could not connect to the server. Please check that the API is running."
+              : "Failed to create user");
       console.error(message);
       setError("root", {
         message,

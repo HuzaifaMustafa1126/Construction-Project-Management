@@ -1,6 +1,12 @@
-const normalizeEmail = (value) => value.trim().toLowerCase();
+const normalizeEmail = (value) =>
+  String(value ?? "")
+    .trim()
+    .toLowerCase();
 // Compare formatting variants without guessing a country for local numbers.
-const normalizePhone = (value) => value.replace(/\D/g, "").replace(/^00/, "");
+const normalizePhone = (value) =>
+  String(value ?? "")
+    .replace(/\D/g, "")
+    .replace(/^00/, "");
 
 export function getUserDuplicateErrors(form, users, editingId = null) {
   const errors = {};
