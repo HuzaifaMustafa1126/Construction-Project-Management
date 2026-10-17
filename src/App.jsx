@@ -10,6 +10,7 @@ import AddUserPage from "./pages/AddUserPage";
 
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute";
 import { ToastContainer } from "react-toastify";
 
 function App() {
@@ -25,11 +26,16 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<HomePageOne />} />
-            <Route path="/users" element={<UsersListPage />} />
-            <Route path="/add-user" element={<AddUserPage />} />
-            <Route path="/users/new" element={<AddUserPage />} />
-            <Route path="/users/:userId/edit" element={<AddUserPage />} />
-            <Route path="/daily-site-reports" element={<DailySiteReportsPage />} />
+            <Route element={<AdminRoute />}>
+              <Route path="/users" element={<UsersListPage />} />
+              <Route path="/add-user" element={<AddUserPage />} />
+              <Route path="/users/new" element={<AddUserPage />} />
+              <Route path="/users/:userId/edit" element={<AddUserPage />} />
+              <Route
+                path="/daily-site-reports"
+                element={<DailySiteReportsPage />}
+              />
+            </Route>
           </Route>
         </Routes>
       </BrowserRouter>

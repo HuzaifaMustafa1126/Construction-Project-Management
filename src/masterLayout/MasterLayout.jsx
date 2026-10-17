@@ -10,7 +10,8 @@ import { toast } from "react-toastify";
 const MasterLayout = ({ children }) => {
   let [sidebarActive, seSidebarActive] = useState(false);
   let [mobileMenu, setMobileMenu] = useState(false);
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
+  const isAdmin = user?.role?.trim().toLowerCase() === "admin";
   const navigate = useNavigate();
   const [loggingOut, setLoggingOut] = useState(false);
 
@@ -161,32 +162,40 @@ const MasterLayout = ({ children }) => {
               </NavLink>
             </li>
 
-            <li>
-              <NavLink
-                to="/daily-site-reports"
-                end
-                className={({ isActive }) => (isActive ? "active-page" : "")}
-              >
-                <Icon
-                  icon="solar:document-text-outline"
-                  className="menu-icon"
-                />
-                <span>Daily Site Reports</span>
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/users"
-                end
-                className={({ isActive }) => (isActive ? "active-page" : "")}
-              >
-                <Icon
-                  icon="solar:users-group-rounded-outline"
-                  className="menu-icon"
-                />
-                <span>Users</span>
-              </NavLink>
-            </li>
+            {isAdmin && (
+              <>
+                <li>
+                  <NavLink
+                    to="/daily-site-reports"
+                    end
+                    className={({ isActive }) =>
+                      isActive ? "active-page" : ""
+                    }
+                  >
+                    <Icon
+                      icon="solar:document-text-outline"
+                      className="menu-icon"
+                    />
+                    <span>Daily Site Reports</span>
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/users"
+                    end
+                    className={({ isActive }) =>
+                      isActive ? "active-page" : ""
+                    }
+                  >
+                    <Icon
+                      icon="solar:users-group-rounded-outline"
+                      className="menu-icon"
+                    />
+                    <span>Users</span>
+                  </NavLink>
+                </li>
+              </>
+            )}
             {/* Other dashboard pages are available in the demo. You can check them out by clicking on the below link. */}
             {/* <ul className="sidebar-submenu">
                 <li>
